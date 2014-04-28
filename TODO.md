@@ -1,8 +1,6 @@
 # Smart contract
 
-* Add an option for the proposer to "accept" or "reject" his proposition in the
-  same contract call.
-* Should we use Serpent instead of LLL?
+* Provide a Serpent version.
 
 # Ðapp
 

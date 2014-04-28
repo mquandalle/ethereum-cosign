@@ -14,7 +14,7 @@ language with which we can build whatever we want (including multisigs).
 
 ```lisp
 [[0]]          ; Number of participants (n < 256)
-[[1]]          ; Number of signatures required to accept a transaction
+[[1]]          ; Number of signatures required to accept a transaction (> 0)
 [[2]]          ; Number of transaction proposals
 [[3]]          ; Amount of money frozen in pending transactions
 ```
@@ -69,6 +69,7 @@ These storage values contain:
 0x00: 0x01
 0x20: address
 0x40: amount (0 = suicide)
+0x60: nextAction (2 = accept, 3 = reject) [optional]
 ```
 
 ### Accept

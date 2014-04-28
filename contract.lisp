@@ -41,12 +41,17 @@
       [[@location]] 1
       [[(+ @location 1)]] @txReceiver
       [[(+ @location 2)]] @txAmount
+
+      ; Accept or reject the proposition without doing another contract call
+      [action] (calldataload 0x60)
     })
   })
 
   ; Accept or reject an existing transaction
   (when (|| (= @action 2) (= @action 3)) {
-    [txId] (calldataload 0x20)
+    ; Retreive the transaction id. This id can come from the contract
+    ; proposition (original action = 1) or attached as a call data.
+    (unless @txId [txId] (calldataload 0x20))
     (unless @txId (stop))
 
     [location] (* @txId 5)
