@@ -2,8 +2,6 @@
 
 * Add an option for the proposer to "accept" or "reject" his proposition in the
   same contract call.
-* Remove the unnecessary [0] "nbParticipants"? We could just count the number of
-  signatures.
 * Should we use Serpent instead of LLL?
 
 # Ðapp

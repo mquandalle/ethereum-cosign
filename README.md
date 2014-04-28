@@ -10,37 +10,45 @@ language with which we can build whatever we want (including multisigs).
 
 ## Contract persistent storage
 
+### Contract global data
+
 ```lisp
-[[0]]           ; Number of participants (n < 256)
-[[1]]           ; Number of signatures required to accept a transaction
-[[2]]           ; Number of transaction proposals
-[[3]]           ; Amount of money frozen in pending transactions
-
-
-[[10]]          ; Participant n°0 address
-[[11]]          ; Participant n°1 address
-[[12]]          ; Participant n°2 address
-[[10+i]]        ; Participant n°i address (i < n)
-
-
-[[1000]]        ; Transaction n°0: state
-[[1001]]        ; Transaction n°0: receiver
-[[1002]]        ; Transaction n°0: amount
-[[1003]]        ; Transaction n°0: accept votes
-[[1004]]        ; Transaction n°0: reject votes
-
-
-[[t*10+1000]]   ; Transaction n°t: state
-[[t*10+1001]]   ; Transaction n°t: receiver
-[[t*10+1002]]   ; Transaction n°t: amount
-[[t*10+1003]]   ; Transaction n°t: accept votes
-[[t*10+1004]]   ; Transaction n°t: reject votes
+[[0]]          ; Number of participants (n < 256)
+[[1]]          ; Number of signatures required to accept a transaction
+[[2]]          ; Number of transaction proposals
+[[3]]          ; Amount of money frozen in pending transactions
 ```
 
-Keys prior to 100 must be set in the initialization block. Keys `0`, `1`, and
-in the `[10, 999]` range are immutable.
+Keys `0` and `1` must be defined in the initialization phase and are immutable.
+Keys `2` and `3` start at `0` and don't need to be initialized.
 
-In the transaction storage (ie keys >= 1000) the following symbols represent:
+### Participants indexes
+
+```lisp
+[[-addr1]]       ; = 1
+[[-addr2]]       ; = 2
+[[-addri]]       ; = i (i <= n)
+```
+
+These keys must be defined in the initialization phase. The value is a number
+in the `[1, 256]` range called _participant index_. If two addresses share the
+same index, only the first one to vote will count.
+
+We use negative keys to avoid collision with the transactions data (see below).
+The biggest address is `(2^8)^20 = 2^160` so the maximum number of transaction without risking a storage collision is `(2^256 - 2^160)/5` which is superior to
+`10^77`.
+
+### Cosign transactions data
+
+```lisp
+[[t*5]]         ; Transaction n°t: state (t > 0)
+[[t*5+1]]       ; Transaction n°t: receiver
+[[t*5+2]]       ; Transaction n°t: amount
+[[t*5+3]]       ; Transaction n°t: accept votes
+[[t*5+4]]       ; Transaction n°t: reject votes
+```
+
+These storage values contain:
 
 * __state__:
   * `0x01` pending
