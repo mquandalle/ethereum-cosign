@@ -96,7 +96,7 @@
           })
         })
       })
-      [i] 100 ; break the main loop
+      (stop) ; Break the main loop
     })
   })
 }
