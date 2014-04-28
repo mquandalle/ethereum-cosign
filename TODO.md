@@ -4,10 +4,6 @@
   same contract call.
 * Remove the unnecessary [0] "nbParticipants"? We could just count the number of
   signatures.
-* Using bit operators to merge all votes in a single key storage? Transaction
-  votes could then be stored in something like `0111001`. Then how do we
-  "reject" transaction? How do we count the number of `1`? Does that reduce GAS
-  usage?
 * Should we use Serpent instead of LLL?
 
 # Ðapp
