@@ -3,22 +3,7 @@
 # 'meteor add' and 'meteor remove' will edit this file for you,
 # but you can also edit it by hand.
 
-meteor
-webapp
-#logging
-deps
-session
-#livedata
-#mongo-livedata
-ui
-spacebars
-templating
-#check
-underscore
-jquery
-#random
-#ejson
-
+standard-app-packages
 coffeescript
-jade
+#jade
 stylus

@@ -1,0 +1,1 @@
+Session.setDefault "currentContract", null
