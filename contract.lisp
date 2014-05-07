@@ -76,10 +76,10 @@
         [requiredSigs] (+ (- @@0 @@1) 1)
       )
 
-      ; Count the number of votes, ie the number of bits set. We use the Brian
+      ; Count the number of votes, ie the number of bits set. We use Brian
       ; Kernighan's method:
       ; for (nbVotes = 0; votes; nbVotes++)
-      ;   nbVotes &= nbVotes -1
+      ;   votes &= votes - 1
       (for () @votes [nbVotes] (+ @nbVotes 1) [votes] (& @votes (- @votes 1)))
 
       ; If there are enough votes, do the job
