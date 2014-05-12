@@ -21,7 +21,7 @@ class cosignContract extends Contract
     VOTEACCEPT: 2
     VOTEREJECT: 3
 
-  init: ->
+  constructor: ->
     @nParticipants = 3
     @nRequiredSigs = 2
 
@@ -32,30 +32,11 @@ class cosignContract extends Contract
     # Optional: name registration
     # @msg(0x929b11b8eeea00966e873a241d4b67f7540d1f38, 0, 0, "chronos")
 
-  main: (data) ->
-    # Get the caller cosign index
-    myIndex = @storage[-@tx.origin]
-    @stop() unless myIndex
-
-    action = data[0]
-
-    # Propose a new transaction
-    if action == @ACTIONS.PROPOSE
-      txId = @propose(data[1], data[2])
-      action = data[3]
-
-    # Accept or reject an existing transaction
-    if action == @ACTIONS.VOTEACCEPT || @action == @ACTIONS.VOTEREJECT
-      # Retreive the transaction id. This id can come from the contract
-      # proposition (original action = 1) or attached as a call data.
-      unless txId then txId = data[1]
-      @vote(myIndex, txId, action)
-
-  getTransactionLoc: (txId) -> txId * 5
-
-  propose: (txReceiver, txAmount) ->
+  # Public method: @data[0] = @ACTIONS.PROPOSE
+  propose: (txReceiver, txAmount, nextAction) ->
     # Check if the contract contains enough "none-pending" money
     @stop() if @balance - @pendingAmount < txAmount
+    myIndex = @getCallerIndex(@caller)
 
     # Update the number of transactions
     txId = ++@nTransactions
@@ -64,17 +45,36 @@ class cosignContract extends Contract
     @pendingAmount += txAmount
 
     # Set the state, the receiver, and the amount
-    location = getTransactionLoc(txId)
+    location = @getTransactionLoc(txId)
     @storage[location] = @STATE.PENDING
     @storage[location + 1] = txReceiver
     @storage[location + 2] = txAmount
 
+    if nextAction == @ACTIONS.VOTEACCEPT || nextAction == @ACTIONS.VOTEREJECT
+      @vote(myIndex, txId, nextAction)
+
     return txId
+
+  # Public method: @data[0] = @ACTIONS.VOTEACCEPT
+  voteaccept: (txId) ->
+    @vote(@getCallerIndex(@caller), txId, @ACTIONS.VOTEACCEPT)
+
+  # Public method: @data[0] = @ACTIONS.REJECT
+  votereject: (txId) ->
+    @vote(@getCallerIndex(@caller), txId, @ACTIONS.VOTEREJECT)
+
+  getCallerIndex: (caller) ->
+    i = @storage[-@tx.origin]
+    @stop() unless i
+    return i
+
+  getTransactionLoc: (txId) ->
+    return txId * 5
 
   vote: (myIndex, txId, vote) ->
     # Check that this is a pending transaction
     @stop() unless txId
-    location = getTransactionLoc(txId)
+    location = @getTransactionLoc(txId)
     @stop() unless @storage[location] == @state.pending
 
     # Participant n°i has voted iff `votes & myVote`
